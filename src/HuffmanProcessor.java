@@ -1,7 +1,4 @@
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.PriorityQueue;
+import java.util.*;
 
 class HuffmanProcessor {
 
@@ -74,5 +71,51 @@ class HuffmanProcessor {
         }
 
         return decoded.toString();
+    }
+
+    public void printAdjacencyList(HuffmanTreeNode root) {
+        Map<Integer, List<Integer>> adjacencyList = new HashMap<>();
+        Map<HuffmanTreeNode, Integer> nodeIds = new HashMap<>();
+        List<String> nodeDescriptions = new ArrayList<>();
+
+        generateAdjacencyList(root, adjacencyList, nodeIds, nodeDescriptions, new int[]{0});
+
+        // Вывод узлов
+        System.out.println("Nodes:");
+        for (String description : nodeDescriptions) {
+            System.out.println(description);
+        }
+
+        // Вывод смежности
+        System.out.println("\nAdjacency List:");
+        adjacencyList.forEach((parent, children) -> {
+            System.out.print(parent + " -> ");
+            System.out.println(children);
+        });
+    }
+
+    private void generateAdjacencyList(HuffmanTreeNode node, Map<Integer, List<Integer>> adjacencyList,
+                                       Map<HuffmanTreeNode, Integer> nodeIds, List<String> nodeDescriptions,
+                                       int[] idCounter) {
+        if (node == null) return;
+
+        int currentId = idCounter[0]++;
+        nodeIds.put(node, currentId);
+
+        if (node.character != null) {
+            nodeDescriptions.add(currentId + ": Char = '" + node.character + "', Freq = " + node.frequency);
+        } else {
+            nodeDescriptions.add(currentId + ": Internal, Freq = " + node.frequency);
+        }
+
+        if (node.left != null) {
+            adjacencyList.computeIfAbsent(currentId, k -> new ArrayList<>()).add(idCounter[0]);
+            generateAdjacencyList(node.left, adjacencyList, nodeIds, nodeDescriptions, idCounter);
+        }
+
+        if (node.right != null) {
+            adjacencyList.computeIfAbsent(currentId, k -> new ArrayList<>()).add(idCounter[0]);
+            generateAdjacencyList(node.right, adjacencyList, nodeIds, nodeDescriptions, idCounter);
+        }
     }
 }
